@@ -5,7 +5,11 @@ use std::io::Write;
 fn main(){
     let content = fizzbuzzer(100);
     let filename = "target/fizzbuzz.txt";
-    write_to_file(filename, &content);
+    
+    match write_to_file(filename, &content) {
+        Ok(()) => println!("Successfully wrote the fizzbuzz to {:?}", filename),
+        Err(e) => println!("Error while writing to {:?}: {:?}", filename, e)
+    }
 }
 
 
@@ -28,10 +32,12 @@ fn fizzbuzzer(n: u32) -> Vec<String> {
 }
 
 
-fn write_to_file(filename: &str, content: &Vec<String>) {
+fn write_to_file(filename: &str, content: &[String]) -> Result<(), std::io::Error>{
     let content_str = content.join("\n");
     let content_byte = content_str.as_bytes();
 
-    let mut file = fs::File::create(filename).expect("Unable to get or create file");
-    file.write(content_byte).expect("Unable to write to file");
+    let mut file = fs::File::create(filename)?;
+    file.write_all(content_byte)?;
+
+    Ok(())
 }
